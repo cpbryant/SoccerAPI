@@ -39,11 +39,7 @@ if response.status_code == 200:
         id TEXT PRIMARY KEY,
         name TEXT,
         coach TEXT,
-        captain TEXT,
-        championships INTEGER,
-        runnersUp INTEGER,
         group_id TEXT,
-        imageUrl TEXT,
         points INTEGER,
         matchesPlayed INTEGER,
         wins INTEGER,
@@ -55,16 +51,7 @@ if response.status_code == 200:
         FOREIGN KEY (group_id) REFERENCES groups (id)
     )
     ''')
-    
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS players (
-        id TEXT PRIMARY KEY,
-        name TEXT,
-        team_id TEXT,
-        FOREIGN KEY (team_id) REFERENCES teams (id)
-    )
-    ''')
-    
+
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS matches (
         id TEXT PRIMARY KEY,
@@ -75,9 +62,7 @@ if response.status_code == 200:
         description TEXT,
         teamA_score INTEGER,
         teamB_score INTEGER,
-        winningTeam TEXT,
-        stadium TEXT,
-        city TEXT
+        winningTeam TEXT
     )
     ''')
     
@@ -92,8 +77,6 @@ if response.status_code == 200:
         assistingPlayer TEXT,
         cardColor TEXT,
         bookedPlayer TEXT,
-        joiningPlayer TEXT,
-        leavingPlayer TEXT,
         FOREIGN KEY (match_id) REFERENCES matches (id)
     )
     ''')
@@ -110,16 +93,12 @@ if response.status_code == 200:
             team_id = team['_id']
             cursor.execute('''
             INSERT OR IGNORE INTO teams 
-            (id, name, coach, captain, championships, runnersUp, group_id, imageUrl, points, matchesPlayed, wins, draws, losses, goalsScored, goalsConceded, goalDifference) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (
+            (id, name, coach, group_id, points, matchesPlayed, wins, draws, losses, goalsScored, goalsConceded, goalDifference) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (
                 team_id, 
                 team['name'], 
                 team['coach'], 
-                team['captain'], 
-                team['championships'], 
-                team['runnersUp'], 
                 team['group'], 
-                team['imageUrl'],
                 team_info['points'], 
                 team_info['matchesPlayed'], 
                 team_info['wins'], 
@@ -130,15 +109,12 @@ if response.status_code == 200:
                 team_info['goalDifference']
             ))
             
-            for player_id in team['players']:
-                cursor.execute('INSERT OR IGNORE INTO players (id, team_id) VALUES (?, ?)', (player_id, team_id))
-        
         for match in group['matches']:
             match_id = match['_id']
             cursor.execute('''
             INSERT OR IGNORE INTO matches 
-            (id, number, stage, date, minutesCompleted, description, teamA_score, teamB_score, winningTeam, stadium, city) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (
+            (id, number, stage, date, minutesCompleted, description, teamA_score, teamB_score, winningTeam) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''', (
                 match_id, 
                 match['number'], 
                 match['stage'], 
@@ -147,16 +123,14 @@ if response.status_code == 200:
                 match['description'], 
                 match['teamA']['score'], 
                 match['teamB']['score'], 
-                match['winningTeam'], 
-                match['stadium'], 
-                match['city']
+                match['winningTeam']
             ))
             
             for event in match['matchEvents']:
                 cursor.execute('''
                 INSERT OR IGNORE INTO match_events 
-                (match_id, minute, type, team, scoringPlayer, assistingPlayer, cardColor, bookedPlayer, joiningPlayer, leavingPlayer) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (
+                (match_id, minute, type, team, scoringPlayer, assistingPlayer, cardColor, bookedPlayer) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', (
                     match_id,
                     event['minute'],
                     event['type'],
@@ -164,9 +138,7 @@ if response.status_code == 200:
                     event.get('scoringPlayer'),
                     event.get('assistingPlayer'),
                     event.get('cardColor'),
-                    event.get('bookedPlayer'),
-                    event.get('joiningPlayer'),
-                    event.get('leavingPlayer')
+                    event.get('bookedPlayer')
                 ))
 
     # Commit and close connection
