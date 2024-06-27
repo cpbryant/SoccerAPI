@@ -125,6 +125,20 @@ def insert_group_data(cursor, group):
                 event.get('bookedPlayer')
             ))
 
+def searchTeam(team, cursor):
+
+    cursor.execute('''
+                   SELECT * FROM teams WHERE name=?
+                   ''', (team,))
+    teamDetails = cursor.fetchone()
+
+    if teamDetails:
+        columns = [description[0] for description in cursor.description]
+        teamDict = dict(zip(columns, teamDetails))
+        print(teamDict)
+    else:
+        print('Team is not in 2024 Euros')
+
 def main():
     groups_url = "https://euro-20242.p.rapidapi.com/groups"
     headers = {
@@ -143,7 +157,13 @@ def main():
             insert_group_data(cursor, group)
         
         conn.commit()
-        conn.close()
+    
+        userTeam = input("What team would you like information on: ")
+        return searchTeam(userTeam, cursor)
+
+    conn.close()
+
+    
 
 if __name__ == "__main__":
     main()
