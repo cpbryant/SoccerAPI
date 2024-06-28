@@ -125,18 +125,32 @@ def insert_group_data(cursor, group):
                 event.get('bookedPlayer')
             ))
 
-def searchTeam(team, cursor):
+def searchTeam(cursor):
+    userTeam = input("What team would you like information on: ")
     cursor.execute('''
-                   SELECT * FROM teams WHERE name=?
-                   ''', (team,))
-    teamDetails = cursor.fetchone()
+                   SELECT name, coach, points, matchesPlayed, wins, draws, losses, 
+                   goalsScored, goalsConceded, goalDifference FROM teams WHERE name=?
+                   ''', (userTeam,))
+    teamDetails = cursor.fetchall()
 
     if teamDetails:
-        columns = [description[0] for description in cursor.description]
-        teamDict = dict(zip(columns, teamDetails))
-        print(teamDict)
+        for detail in teamDetails:
+            print(f'''Team: {detail[0]}\t Coach: {detail[1]}\t Points: {detail[2]}\t Matches Played: {detail[3]}\t Wins: {detail[4]}\t Draws: {detail[5]}\t Losses: {detail[6]}\t Goals Scored:{detail[7]}\t Goals Conceded:{detail[8]}\t Goal Difference: {detail[9]}''')
+        # columns = [description[0] for description in cursor.description]
+        # teamDict = dict(zip(columns, teamDetails))
+        # print(teamDict)
     else:
         print('Team is not in 2024 Euros')
+    
+    print('\nOptions:\n 1. Select another team\n 2. Return to main menu\n 3. Exit')
+    choice = input('Please select an option using the associated number: ')
+    if choice == '1':
+        return searchTeam(cursor)
+    elif choice == '2':
+        return main()
+    else:
+        print('Goodbye!')
+    
 
 def view_groups(cursor):
     cursor.execute('''
@@ -148,16 +162,19 @@ def view_groups(cursor):
     
     quest = input("Would you like more information on a specific group (yes/no): ")
     if quest == 'yes':
-        group = input('Enter group letter: ')
-        return group_details(group, cursor)
+        # group = input('Enter group letter: ')
+        return group_details(cursor)
     else:
-        toMenu = input("Return to main menu (yes/no): ")
-        if toMenu == 'yes':
+        print('\nOptions:\n 1. Return to main menu\n 2. Exit')
+        choice = input('Please select an option using the associated number: ')
+        if choice == '1':
             return main()
         else:
-            print('Goodbye!')    
+            print('Goodbye!')
+          
 
-def group_details(group, cursor):
+def group_details(cursor):
+    group = input('Enter group letter: ')
     cursor.execute('''
                    SELECT number, stage, date, minutesCompleted, description, teamA_score,
                    teamB_score, winningTeam FROM matches WHERE description=?
@@ -165,9 +182,16 @@ def group_details(group, cursor):
     groupDetails = cursor.fetchall()
 
     for detail in groupDetails:
-        print(f'''Group: {detail[4]}\t Number: {detail[0]}\t Stage: {detail[1]}\t Date: {detail[2]}\t Minutes Completed: {detail[3]}\t Team A Score: {detail[5]}\t Team B Score: {detail[6]}\t Winning Team: {detail[7]}
-              ''')
+        print(f'''Group: {detail[4]}\t Number: {detail[0]}\t Stage: {detail[1]}\t Date: {detail[2]}\t Minutes Completed: {detail[3]}\t Team A Score: {detail[5]}\t Team B Score: {detail[6]}\t Winning Team: {detail[7]}''')
     
+    print('\nOptions:\n 1. Choose another group\n 2. Return to main menu\n 3. Exit')
+    choice = input('Please select an option using the associated number: ')
+    if choice == '1':
+        return group_details(cursor)
+    elif choice == '2':
+        return main()
+    else:
+        print('Goodbye!')
     # columns = [description[0] for description in cursor.description]
     # groupDicts = []
     # for row in groupDetails:
@@ -177,10 +201,9 @@ def group_details(group, cursor):
     # for grouped in groupDicts:
     #     print(grouped)
 
-    #print(f"Team: {standing[0]}, Points: {standing[1]}, Matches Played: {standing[2]}, Wins: {standing[3]}, Draws: {standing[4]}, Losses: {standing[5]}, Goal Difference: {standing[6]}")
 
-
-def view_matches(cursor, match_date):
+def view_matches(cursor):
+    match_date = input("Enter the match date (YYYY-MM-DD): ")
     cursor.execute('''
                    SELECT stage, date, description, teamA_score, teamB_score, winningTeam 
                    FROM matches WHERE date LIKE ?
@@ -198,15 +221,21 @@ def view_matches(cursor, match_date):
                 'Team B Score' : match[4],
                 'Winning Team' : match[5]
             })
-        print(matches_list)
+        #print(matches_list)
+        for match in matches_list:
+            #print(f'Match: {match[1]}')
+            print(match)
     else:
         print(f"No matches found on {match_date}")
 
-     
-    for match in matches_list:
-         #print(f'Match: {match[1]}')
-         print(match)
-     
+    print('\nOptions:\n 1. Select another date\n 2. Return to main menu\n 3. Exit')
+    choice = input('Please select an option using the associated number: ')
+    if choice == '1':
+        return view_matches(cursor)
+    elif choice == '2':
+        return main()
+    else:
+        print('Goodbye!') 
 
 def see_team_standings(cursor):
     cursor.execute('''
@@ -217,7 +246,13 @@ def see_team_standings(cursor):
     standings = cursor.fetchall()
     for standing in standings:
         print(f"Team: {standing[0]}, Points: {standing[1]}, Matches Played: {standing[2]}, Wins: {standing[3]}, Draws: {standing[4]}, Losses: {standing[5]}, Goal Difference: {standing[6]}")
-
+    
+    print('\nOptions:\n 1. Return to main menu\n 2. Exit')
+    choice = input('Please select an option using the associated number: ')
+    if choice == '1':
+        return main()
+    else:
+        print('Goodbye!') 
 
 
 def main():
@@ -250,11 +285,9 @@ def main():
             choice = input('Please select an option using the associated number: ')
 
             if choice == '1':
-                match_date = input("Enter the match date (YYYY-MM-DD): ")
-                return view_matches(cursor, match_date)
+                return view_matches(cursor)
             elif choice == '2':
-                userTeam = input("What team would you like information on: ")
-                return searchTeam(userTeam, cursor)
+                return searchTeam(cursor)
             elif choice == '3':
                 return view_groups(cursor)
             elif choice == '4':
