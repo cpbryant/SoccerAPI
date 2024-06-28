@@ -135,14 +135,16 @@ def searchTeam(cursor):
 
     if teamDetails:
         for detail in teamDetails:
-            print(f'''Team: {detail[0]}\t Coach: {detail[1]}\t Points: {detail[2]}\t Matches Played: {detail[3]}\t Wins: {detail[4]}\t Draws: {detail[5]}\t Losses: {detail[6]}\t Goals Scored:{detail[7]}\t Goals Conceded:{detail[8]}\t Goal Difference: {detail[9]}''')
+            print(f"Team: {detail[0]}, Coach: {detail[1]}, Points: {detail[2]}, Matches Played: {detail[3]}", 
+                  f"Wins: {detail[4]}, Draws: {detail[5]}, Losses: {detail[6]}, Goals Scored:{detail[7]}", 
+                  f"Goals Conceded:{detail[8]}, Goal Difference: {detail[9]}")
         # columns = [description[0] for description in cursor.description]
         # teamDict = dict(zip(columns, teamDetails))
         # print(teamDict)
     else:
-        print('Team is not in 2024 Euros')
+        print('Team is not in Euro 2024')
     
-    print('\nOptions:\n 1. Select another team\n 2. Return to main menu\n 3. Exit')
+    print('\n------------\nOptions:\n 1. Select another team\n 2. Return to main menu\n 3. Exit')
     choice = input('Please select an option using the associated number: ')
     if choice == '1':
         return searchTeam(cursor)
@@ -165,13 +167,12 @@ def view_groups(cursor):
         # group = input('Enter group letter: ')
         return group_details(cursor)
     else:
-        print('\nOptions:\n 1. Return to main menu\n 2. Exit')
+        print('\n------------\nOptions:\n 1. Return to main menu\n 2. Exit')
         choice = input('Please select an option using the associated number: ')
         if choice == '1':
             return main()
         else:
-            print('Goodbye!')
-          
+            print('Goodbye!')  
 
 def group_details(cursor):
     group = input('Enter group letter: ')
@@ -182,9 +183,11 @@ def group_details(cursor):
     groupDetails = cursor.fetchall()
 
     for detail in groupDetails:
-        print(f'''Group: {detail[4]}\t Number: {detail[0]}\t Stage: {detail[1]}\t Date: {detail[2]}\t Minutes Completed: {detail[3]}\t Team A Score: {detail[5]}\t Team B Score: {detail[6]}\t Winning Team: {detail[7]}''')
+        print(f"Group: {detail[4]}, Number: {detail[0]}, Stage: {detail[1]}, Date: {detail[2]}", 
+              f"Minutes Completed: {detail[3]}, Team A Score: {detail[5]}, Team B Score: {detail[6]}", 
+              f"Winning Team: {detail[7]}")
     
-    print('\nOptions:\n 1. Choose another group\n 2. Return to main menu\n 3. Exit')
+    print('\n------------\Options:\n 1. Choose another group\n 2. Return to main menu\n 3. Exit')
     choice = input('Please select an option using the associated number: ')
     if choice == '1':
         return group_details(cursor)
@@ -192,15 +195,6 @@ def group_details(cursor):
         return main()
     else:
         print('Goodbye!')
-    # columns = [description[0] for description in cursor.description]
-    # groupDicts = []
-    # for row in groupDetails:
-    #     groupDict = dict(zip(columns, row))
-    #     groupDicts.append(groupDict)
-    
-    # for grouped in groupDicts:
-    #     print(grouped)
-
 
 def view_matches(cursor):
     match_date = input("Enter the match date (YYYY-MM-DD): ")
@@ -221,14 +215,14 @@ def view_matches(cursor):
                 'Team B Score' : match[4],
                 'Winning Team' : match[5]
             })
-        #print(matches_list)
         for match in matches_list:
-            #print(f'Match: {match[1]}')
-            print(match)
+            print(f"Stage: {match['Stage']}, Date: {match['Date']}, Description: {match['Description']}, "
+              f"Team A Score: {match['Team A Score']}, Team B Score: {match['Team B Score']}, "
+              f"Winning Team: {match['Winning Team']}")
     else:
         print(f"No matches found on {match_date}")
 
-    print('\nOptions:\n 1. Select another date\n 2. Return to main menu\n 3. Exit')
+    print('\n------------\nOptions:\n 1. Select another date\n 2. Return to main menu\n 3. Exit')
     choice = input('Please select an option using the associated number: ')
     if choice == '1':
         return view_matches(cursor)
@@ -245,9 +239,10 @@ def see_team_standings(cursor):
                    ''')
     standings = cursor.fetchall()
     for standing in standings:
-        print(f"Team: {standing[0]}, Points: {standing[1]}, Matches Played: {standing[2]}, Wins: {standing[3]}, Draws: {standing[4]}, Losses: {standing[5]}, Goal Difference: {standing[6]}")
+        print(f"Team: {standing[0]}, Points: {standing[1]}, Matches Played: {standing[2]}, Wins: {standing[3]}", 
+              f"Draws: {standing[4]}, Losses: {standing[5]}, Goal Difference: {standing[6]}")
     
-    print('\nOptions:\n 1. Return to main menu\n 2. Exit')
+    print('\n------------\nOptions:\n 1. Return to main menu\n 2. Exit')
     choice = input('Please select an option using the associated number: ')
     if choice == '1':
         return main()
@@ -295,7 +290,7 @@ def main():
         
         conn.close()
 
-    
+
 
 if __name__ == "__main__":
     main()
